@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helpers GoalFlow 🎯</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f7f8fc;--bg2:#eef0f8;--bg3:#e4e7f3;
+  --white:#ffffff;--border:#dde0ee;--border2:#c8ccdf;
+  --mint:#3ecf8e;--mint2:#2bb87a;--mint-bg:#edfaf4;--mint-border:#b3ead4;
+  --coral:#ff6b6b;--coral-bg:#fff0f0;
+  --blue:#4a90e2;--blue-bg:#eef5fd;
+  --purple:#7c5cfc;--purple-bg:#f2effe;
+  --yellow:#f5a623;--yellow-bg:#fff8ee;
+  --dark:#1e2030;--text:#2d3142;--text2:#5a607a;
+  --muted:#8a90a8;--muted2:#b0b6cc;
+  --sans:'Noto Sans KR',sans-serif;--mono:'DM Mono',monospace;
+  --r:12px;--r2:8px;--sh:0 2px 12px rgba(0,0,0,.07);--sh2:0 4px 20px rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.65}
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex;flex-direction:column}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── 공통 버튼 ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:var(--r2);border:none;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-main{background:var(--mint);color:#fff;box-shadow:0 3px 10px rgba(62,207,142,.35)}
+.btn-main:hover{background:var(--mint2);transform:translateY(-1px);box-shadow:0 5px 16px rgba(62,207,142,.4)}
+.btn-outline{background:var(--white);color:var(--text2);border:1.5px solid var(--border2)}
+.btn-outline:hover{border-color:var(--mint);color:var(--mint)}
+.btn-ghost{background:transparent;color:var(--muted);border:none;font-size:13px}
+.btn-ghost:hover{color:var(--text2)}
+.btn-sm{padding:8px 16px;font-size:13px;border-radius:6px}
+
+/* ── 입력창 ── */
+.inp{width:100%;padding:12px 14px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--r2);font-family:var(--sans);font-size:14px;color:var(--text);outline:none;transition:all .2s}
+.inp:focus{border-color:var(--mint);box-shadow:0 0 0 3px rgba(62,207,142,.12)}
+.inp::placeholder{color:var(--muted2)}
+textarea.inp{resize:vertical;min-height:88px;line-height:1.65}
+.fg{margin-bottom:18px}
+.fl{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px}
+
+/* ── 칩 ── */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);color:var(--text2);font-size:13px;cursor:pointer;transition:all .15s;user-select:none}
+.chip:hover{border-color:var(--mint);color:var(--mint)}
+.chip.on{border-color:var(--mint);background:var(--mint-bg);color:var(--mint2);font-weight:600}
+
+/* ══ 랜딩 ══ */
+#landing{align-items:center;justify-content:center;padding:60px 20px 80px;position:relative;overflow:hidden}
+.l-circles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.l-c1{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(62,207,142,.08),transparent);top:-100px;right:-100px}
+.l-c2{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(74,144,226,.06),transparent);bottom:-80px;left:-80px}
+.l-wrap{position:relative;text-align:center;max-width:640px}
+.l-emoji{font-size:48px;margin-bottom:16px;display:block;animation:bob 2s ease-in-out infinite;opacity:0;animation:bob 2s ease-in-out infinite,fu .5s ease .1s forwards}
+.l-tag{display:inline-flex;align-items:center;gap:6px;background:var(--mint-bg);border:1px solid var(--mint-border);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;color:var(--mint2);margin-bottom:20px;opacity:0;animation:fu .5s ease .2s forwards}
+.l-title{font-size:clamp(36px,7vw,64px);font-weight:700;line-height:1.15;color:var(--dark);margin-bottom:16px;letter-spacing:-.02em;opacity:0;animation:fu .6s ease .3s forwards}
+.l-title .hl{color:var(--mint)}
+.l-sub{font-size:16px;color:var(--text2);line-height:1.9;margin-bottom:40px;font-weight:300;opacity:0;animation:fu .6s ease .42s forwards}
+.l-acts{display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap;opacity:0;animation:fu .6s ease .55s forwards}
+.l-note{font-size:12px;color:var(--muted);margin-top:12px;opacity:0;animation:fu .5s ease .7s forwards}
+.l-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:60px;padding-top:44px;border-top:1px solid var(--border);opacity:0;animation:fu .6s ease .82s forwards}
+.lc{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:left;transition:all .2s}
+.lc:hover{box-shadow:var(--sh);transform:translateY(-2px)}
+.lc-icon{font-size:24px;margin-bottom:10px}
+.lc-t{font-size:14px;font-weight:700;margin-bottom:4px;color:var(--dark)}
+.lc-d{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ══ 인증 ══ */
+.auth-wrap{min-height:100vh;display:grid;grid-template-columns:1fr 460px}
+.auth-l{background:linear-gradient(145deg,#1e2030 0%,#2a3050 100%);display:flex;flex-direction:column;justify-content:space-between;padding:52px 56px;position:relative;overflow:hidden}
+.auth-l::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(62,207,142,.15),transparent)}
+.auth-l::after{content:'';position:absolute;bottom:-80px;left:-40px;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(74,144,226,.12),transparent)}
+.al-c{position:relative;z-index:1}
+.al-logo{font-size:22px;font-weight:700;color:#fff;margin-bottom:60px;display:flex;align-items:center;gap:8px}
+.al-logo span{color:var(--mint)}
+.al-big{font-size:36px;font-weight:700;color:#fff;line-height:1.25;margin-bottom:16px}
+.al-big em{color:var(--mint);font-style:normal;display:block}
+.al-sub2{font-size:14px;color:rgba(255,255,255,.5);line-height:1.8;font-weight:300;max-width:320px}
+.al-feats{position:relative;z-index:1}
+.al-feat{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.al-dot{width:8px;height:8px;border-radius:50%;background:var(--mint);flex-shrink:0}
+.al-ft{font-size:13px;color:rgba(255,255,255,.6)}
+.auth-r{background:var(--white);display:flex;flex-direction:column;justify-content:center;padding:60px 48px}
+.ar-t{font-size:24px;font-weight:700;margin-bottom:4px;color:var(--dark)}
+.ar-s{font-size:14px;color:var(--muted);margin-bottom:28px}
+.ar-err{background:var(--coral-bg);border:1px solid #ffd0d0;border-radius:var(--r2);padding:10px 14px;font-size:13px;color:var(--coral);margin-bottom:14px;display:none}
+.ar-sw{text-align:center;margin-top:16px;font-size:13px;color:var(--muted)}
+.ar-sw a{color:var(--mint2);text-decoration:none;font-weight:600;cursor:pointer}
+
+/* ══ 온보딩 ══ */
+#onboarding{background:var(--bg)}
+.ob-layout{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+.ob-side{background:var(--dark);padding:40px 26px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.obs-logo{font-size:18px;font-weight:700;color:#fff;margin-bottom:48px;display:flex;align-items:center;gap:6px}
+.obs-logo span{color:var(--mint)}
+.ob-steps{display:flex;flex-direction:column;gap:4px;flex:1}
+.si{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--r2);transition:all .2s}
+.si.active{background:rgba(62,207,142,.12)}
+.sn{width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:rgba(255,255,255,.35);flex-shrink:0;transition:all .2s;font-family:var(--mono)}
+.si.active .sn{border-color:var(--mint);background:var(--mint);color:#fff}
+.si.done .sn{border-color:rgba(62,207,142,.5);color:rgba(62,207,142,.8)}
+.st{font-size:13px;color:rgba(255,255,255,.35);transition:color .2s}
+.si.active .st{color:#fff;font-weight:500}
+.si.done .st{color:rgba(255,255,255,.5)}
+.ob-main{padding:60px 64px;display:flex;flex-direction:column;justify-content:center;max-width:580px}
+.os{display:none}
+.os.active{display:block;animation:fu .3s ease}
+.oe{font-size:11px;font-weight:600;color:var(--mint2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.ot{font-size:28px;font-weight:700;margin-bottom:8px;line-height:1.25;color:var(--dark)}
+.od{font-size:14px;color:var(--muted);margin-bottom:32px;line-height:1.7}
+.sched{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.dc{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r2);padding:10px 6px;text-align:center;transition:border-color .2s}
+.dc:focus-within{border-color:var(--mint)}
+.dn{font-size:10px;color:var(--muted);font-weight:600;margin-bottom:6px;font-family:var(--mono)}
+.di{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px 4px;color:var(--text);font-size:12px;text-align:center;outline:none;font-family:var(--mono)}
+.di:focus{border-color:var(--mint)}
+.du{font-size:9px;color:var(--muted2);margin-top:3px}
+.ob-acts{display:flex;gap:10px;margin-top:28px}
+
+/* ══ 생성 중 ══ */
+#generating{align-items:center;justify-content:center;background:var(--bg)}
+.gw{text-align:center;max-width:420px;padding:40px}
+.g-anim{width:90px;height:90px;margin:0 auto 36px;position:relative}
+.g-circle{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--mint),var(--blue));position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 1.8s ease-in-out infinite;box-shadow:0 0 24px rgba(62,207,142,.4)}
+.g-ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(62,207,142,.2);animation:rp 1.8s ease-in-out infinite}
+.g-ring2{position:absolute;inset:-14px;border-radius:50%;border:1.5px solid rgba(62,207,142,.1);animation:rp 1.8s ease-in-out .3s infinite}
+.gt{font-size:24px;font-weight:700;color:var(--dark);margin-bottom:6px}
+.gsub{font-size:14px;color:var(--muted);margin-bottom:32px}
+.gsteps{list-style:none;text-align:left;display:flex;flex-direction:column;gap:8px}
+.gstep{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted2);padding:12px 16px;border-radius:var(--r2);background:var(--white);border:1.5px solid var(--border);transition:all .4s}
+.gstep.active{color:var(--mint2);border-color:var(--mint);background:var(--mint-bg);font-weight:600}
+.gstep.done{color:#2d7a4f;border-color:#b3e8cc;background:#edf7f2}
+.gdot{width:7px;height:7px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:all .4s}
+.gstep.active .gdot{background:var(--mint);animation:blink 1s ease infinite}
+.gstep.done .gdot{background:#2d7a4f}
+
+/* ══ 대시보드 ══ */
+#dashboard{background:var(--bg);flex-direction:column}
+.dnav{background:var(--white);border-bottom:1px solid var(--border);padding:0 32px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 0 var(--border)}
+.dnl-logo{font-size:17px;font-weight:700;color:var(--dark);display:flex;align-items:center;gap:6px}
+.dnl-logo span{color:var(--mint)}
+.dnl{display:flex;gap:2px}
+.dnlb{padding:6px 14px;border-radius:6px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;transition:all .15s;font-family:var(--sans)}
+.dnlb:hover{background:var(--bg2);color:var(--text2)}
+.dnlb.active{background:var(--mint-bg);color:var(--mint2);font-weight:600}
+.dnu{display:flex;align-items:center;gap:10px}
+.dnav2{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--mint),var(--blue));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+.dnn{font-size:13px;font-weight:600;color:var(--text2)}
+.dnlo{font-size:12px;color:var(--muted2);cursor:pointer;padding:4px 8px;border-radius:6px;border:none;background:none;font-family:var(--sans)}
+.dnlo:hover{color:var(--coral);background:var(--coral-bg)}
+.dbody{padding:32px;max-width:1060px;width:100%;margin:0 auto}
+
+/* 알림 배너 */
+.notif-bar{background:linear-gradient(135deg,var(--coral),#ff8c42);border-radius:var(--r);padding:14px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px;color:#fff;animation:shake .4s ease}
+.notif-icon{font-size:22px;flex-shrink:0}
+.notif-text{flex:1;font-size:13px;font-weight:500;line-height:1.5}
+.notif-btn{background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--sans)}
+.notif-btn:hover{background:rgba(255,255,255,.35)}
+.notif-close{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:16px;padding:4px;flex-shrink:0}
+
+/* 환영 배너 */
+.wb{background:linear-gradient(135deg,var(--dark),#2a3050);border-radius:var(--r);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;position:relative;overflow:hidden}
+.wb::before{content:'🎯';position:absolute;right:140px;top:50%;transform:translateY(-50%);font-size:80px;opacity:.08}
+.wb-t h2{font-size:20px;font-weight:700;color:#fff;margin-bottom:6px}
+.wb-t h2 em{color:var(--mint);font-style:normal}
+.wb-t p{font-size:13px;color:rgba(255,255,255,.55);line-height:1.6;max-width:340px}
+
+/* 인사 */
+.grt{margin-bottom:22px}
+.grt-d{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.grt-t{font-size:24px;font-weight:700;color:var(--dark)}
+.grt-t em{color:var(--mint);font-style:normal}
+
+/* 목표 정보 */
+.gic{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px}
+.gii{font-size:28px}
+.gin{font-size:15px;font-weight:700;color:var(--dark);margin-bottom:2px}
+.gim{font-size:12px;color:var(--muted);font-family:var(--mono)}
+
+/* 통계 */
+.sr{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.sc{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:18px;transition:all .2s}
+.sc:hover{box-shadow:var(--sh);border-color:var(--border2)}
+.scl{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.scv{font-size:36px;font-weight:700;line-height:1;color:var(--dark)}
+.scv.g{color:var(--mint2)}
+.scv.c{color:var(--coral)}
+.scs{font-size:11px;color:var(--muted2);margin-top:5px}
+
+/* 빈 화면 */
+.es{background:var(--white);border:1.5px dashed var(--border2);border-radius:var(--r);padding:52px 32px;text-align:center}
+.es-icon{font-size:40px;margin-bottom:14px}
+.es-t{font-size:20px;font-weight:700;color:var(--dark);margin-bottom:8px}
+.es-d{font-size:14px;color:var(--muted);margin-bottom:22px;line-height:1.7}
+
+/* 메인 그리드 */
+.dg{display:grid;grid-template-columns:1fr 310px;gap:18px}
+.panel{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.ph{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.pt{font-size:13px;font-weight:700;color:var(--dark)}
+.pbadge{font-size:10px;padding:3px 9px;border-radius:10px;font-weight:700;font-family:var(--mono)}
+.bm{background:var(--mint-bg);color:var(--mint2);border:1px solid var(--mint-border)}
+.bc{background:var(--coral-bg);color:var(--coral);border:1px solid #ffd0d0}
+.bb{background:var(--blue-bg);color:var(--blue);border:1px solid #c0d8f5}
+.bp{background:var(--purple-bg);color:var(--purple);border:1px solid #d0c0fc}
+.bgr{background:var(--bg2);color:var(--muted);border:1px solid var(--border)}
+.pbody{padding:18px}
+
+/* 프로그레스 */
+.prh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.prl{font-size:12px;color:var(--muted);font-weight:500}
+.prp{font-size:12px;color:var(--mint2);font-weight:700;font-family:var(--mono)}
+.prbar{height:8px;background:var(--bg3);border-radius:100px;overflow:hidden;margin-bottom:16px}
+.prfill{height:100%;background:linear-gradient(90deg,var(--mint),#7edfa8);border-radius:100px;transition:width 1s ease}
+
+/* 태스크 */
+.tl{display:flex;flex-direction:column;gap:8px}
+.ti{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--bg);border-radius:var(--r2);border:1.5px solid var(--border);cursor:pointer;transition:all .2s}
+.ti:hover{border-color:var(--border2);background:var(--bg2)}
+.ti.done{opacity:.4}
+.ti.done .tname{text-decoration:line-through}
+.tck{width:20px;height:20px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .2s;font-size:11px;flex-shrink:0}
+.ti.done .tck{background:var(--mint);border-color:var(--mint);color:#fff}
+.tmeta{flex:1}
+.tname{font-size:13px;font-weight:500;margin-bottom:2px;color:var(--dark)}
+.ttime{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.tdur{font-family:var(--mono);font-size:10px;color:var(--muted2);padding:2px 8px;background:var(--bg2);border-radius:4px;border:1px solid var(--border);flex-shrink:0}
+
+/* 주간 차트 */
+.wc{display:flex;align-items:flex-end;gap:6px;height:50px}
+.bw{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;background:var(--bg3);transition:height .7s ease;min-height:3px}
+.bar.done{background:var(--mint-border)}
+.bar.tod{background:var(--mint)}
+.bl{font-size:9px;color:var(--muted2);font-family:var(--mono)}
+
+/* 연속 실행 */
+.strk-num{font-size:52px;font-weight:700;color:var(--coral);line-height:1}
+.strk-lbl{font-size:13px;font-weight:600;color:var(--text2)}
+.strk-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.wdots{display:flex;gap:5px;margin-top:12px}
+.wd{flex:1;height:6px;border-radius:100px;background:var(--bg3)}
+.wd.done{background:var(--coral)}
+.wd.tod{background:var(--yellow);animation:blink 1.8s ease infinite}
+
+/* AI 버블 */
+.ail{font-size:11px;font-weight:600;color:var(--mint2);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ail-dot{width:7px;height:7px;border-radius:50%;background:var(--mint);animation:blink 1.5s ease infinite}
+.aib{background:var(--mint-bg);border:1px solid var(--mint-border);border-radius:var(--r2);border-top-left-radius:2px;padding:14px 16px;font-size:13px;line-height:1.75;color:var(--text2)}
+.aib strong{color:var(--mint2);font-weight:700}
+
+/* 실행 완료 버튼 */
+.exb{width:100%;padding:13px;margin-top:14px;background:linear-gradient(135deg,var(--mint),var(--blue));color:#fff;border:none;border-radius:var(--r2);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--sans);box-shadow:0 3px 10px rgba(62,207,142,.3)}
+.exb:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(62,207,142,.4)}
+.exb:disabled{opacity:.5;transform:none;cursor:default}
+
+/* ══ AI 채팅 플랜 수정 (유료) ══ */
+.chat-panel{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.chat-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.chat-msgs{flex:1;padding:16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;min-height:200px;max-height:280px;background:var(--bg)}
+.msg{max-width:85%;font-size:13px;line-height:1.65;border-radius:12px;padding:10px 14px}
+.msg-ai{background:var(--mint-bg);border:1px solid var(--mint-border);color:var(--text2);align-self:flex-start;border-bottom-left-radius:2px}
+.msg-ai strong{color:var(--mint2)}
+.msg-user{background:var(--mint);color:#fff;align-self:flex-end;border-bottom-right-radius:2px}
+.msg-typing{background:var(--bg2);border:1px solid var(--border);color:var(--muted);align-self:flex-start;border-bottom-left-radius:2px;display:none}
+.chat-input-row{padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--white)}
+.chat-inp{flex:1;padding:10px 14px;background:var(--bg2);border:1.5px solid var(--border);border-radius:20px;font-family:var(--sans);font-size:13px;color:var(--text);outline:none;transition:border-color .2s}
+.chat-inp:focus{border-color:var(--mint)}
+.chat-send{background:var(--mint);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;color:#fff;font-size:16px}
+.chat-send:hover{background:var(--mint2);transform:scale(1.05)}
+
+/* 구독 배너 */
+.upg{background:linear-gradient(135deg,#1e2030,#2a3050);border-radius:var(--r);padding:20px;margin-top:14px;position:relative;overflow:hidden}
+.upg::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--mint),var(--blue),var(--purple))}
+.upg-crown{font-size:24px;margin-bottom:8px;display:block}
+.upg-t{font-size:16px;font-weight:700;color:#fff;margin-bottom:3px}
+.upg-s{font-size:11px;color:rgba(255,255,255,.4);margin-bottom:10px;font-family:var(--mono)}
+.upg-d{font-size:12px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:14px}
+.upg-price{font-size:20px;font-weight:700;color:var(--mint);margin-bottom:14px}
+.upg-price span{font-size:12px;color:rgba(255,255,255,.4);font-weight:400}
+.upg-b{background:var(--mint);border:none;border-radius:var(--r2);padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--sans);color:#fff;width:100%}
+.upg-b:hover{background:var(--mint2)}
+.upg-feat{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.upg-fi{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,.55)}
+.upg-fi::before{content:'✓';color:var(--mint);font-weight:700;flex-shrink:0}
+
+/* 잠금 오버레이 */
+.lock-overlay{position:relative}
+.lock-overlay .lo-mask{position:absolute;inset:0;background:rgba(247,248,252,.9);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:10;backdrop-filter:blur(3px)}
+.lo-icon{font-size:28px}
+.lo-t{font-size:14px;font-weight:700;color:var(--dark)}
+.lo-d{font-size:12px;color:var(--muted);text-align:center;line-height:1.6}
+
+/* ── 애니메이션 ── */
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.08)}}
+@keyframes rp{0%{transform:scale(1);opacity:.5}60%,100%{transform:scale(1.4);opacity:0}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+
+@media(max-width:900px){
+  .auth-wrap{grid-template-columns:1fr}.auth-l{display:none}
+  .auth-r{padding:40px 24px}
+  .ob-layout{grid-template-columns:1fr}.ob-side{display:none}
+  .ob-main{padding:40px 20px}
+  .sr{grid-template-columns:repeat(2,1fr)}
+  .dg{grid-template-columns:1fr}
+  .dbody{padding:20px 16px}
+  .l-cards{grid-template-columns:1fr}
+  .dnl{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ 랜딩 ══ -->
+<div id="landing" class="screen active">
+  <div class="l-circles"><div class="l-c1"></div><div class="l-c2"></div></div>
+  <div class="l-wrap">
+    <span class="l-emoji">🎯</span>
+    <div class="l-tag">✨ AI 실행 도우미</div>
+    <h1 class="l-title">목표, 이번엔<br><span class="hl">진짜로 해내자!</span></h1>
+    <p class="l-sub">목표만 세우고 흐지부지됐던 경험 있죠?<br>Helpers GoalFlow가 매일 옆에서 같이 해낼게요 💪</p>
+    <div class="l-acts">
+      <button class="btn btn-main" onclick="G('signup')" style="padding:14px 32px;font-size:15px">나도 해볼게요! →</button>
+      <button class="btn btn-outline" onclick="G('login')">이미 있어요</button>
+    </div>
+    <p class="l-note">✓ 실행 도우미 무료 &nbsp;·&nbsp; ✓ AI 맞춤 플랜 월 9,900원 &nbsp;·&nbsp; ✓ 언제든 해지 가능</p>
+    <div class="l-cards">
+      <div class="lc"><div class="lc-icon">🤖</div><div class="lc-t">AI가 플랜 짜줘요</div><div class="lc-d">내 목표·스케줄·수준에 딱 맞는 플랜을 자동으로 만들어줘요</div></div>
+      <div class="lc"><div class="lc-icon">🔔</div><div class="lc-t">실행 안 하면 알려줘요</div><div class="lc-d">오늘 실행을 까먹을 것 같으면 바로 알림 보내드려요</div></div>
+      <div class="lc"><div class="lc-icon">💬</div><div class="lc-t">AI랑 플랜 수정 가능</div><div class="lc-d">너무 힘들거나 쉽다면 AI에게 말해보세요. 바로 조정해드려요</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 회원가입 ══ -->
+<div id="signup" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-l">
+      <div class="al-c">
+        <div class="al-logo">🎯 Helpers <span>GoalFlow</span></div>
+        <div class="al-big">목표 달성,<em>같이 해봐요! 🙌</em></div>
+        <p class="al-sub2">혼자 하면 힘들잖아요. AI가 매일 옆에서 응원하고 챙겨드려요.</p>
+      </div>
+      <div class="al-feats">
+        <div class="al-feat"><div class="al-dot"></div><div class="al-ft">매일 실행 체크 & 알림 — 완전 무료!</div></div>
+        <div class="al-feat"><div class="al-dot"></div><div class="al-ft">1주일마다 AI가 플랜 새로 짜줘요</div></div>
+        <div class="al-feat"><div class="al-dot"></div><div class="al-ft">AI랑 대화로 플랜 수정 — 월 9,900원</div></div>
+      </div>
+    </div>
+    <div class="auth-r">
+      <div class="ar-t">안녕하세요! 👋</div>
+      <div class="ar-s">계정 만들고 바로 시작해봐요</div>
+      <div class="ar-err" id="se"></div>
+      <div class="fg"><label class="fl">이름 (뭐라고 불러드릴까요?)</label><input class="inp" id="sn" type="text" placeholder="예: 민준, 지혜, 수현..."></div>
+      <div class="fg"><label class="fl">이메일</label><input class="inp" id="sem" type="email" placeholder="email@example.com"></div>
+      <div class="fg"><label class="fl">비밀번호 (8자 이상)</label><input class="inp" id="sp" type="password" placeholder="기억하기 쉬운 걸로 해요!"></div>
+      <div class="fg"><label class="fl">비밀번호 한 번 더</label><input class="inp" id="sp2" type="password" placeholder="한 번 더 입력해주세요"></div>
+      <button class="btn btn-main" style="width:100%;justify-content:center;padding:14px" onclick="doSignup()">시작하기! 🚀</button>
+      <div class="ar-sw">이미 계정이 있으신가요? <a onclick="G('login')">로그인하기</a></div>
+      <div style="text-align:center;margin-top:6px"><button class="btn btn-ghost" onclick="G('landing')">← 처음으로</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 로그인 ══ -->
+<div id="login" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-l">
+      <div class="al-c">
+        <div class="al-logo">🎯 Helpers <span>GoalFlow</span></div>
+        <div class="al-big">다시 오셨군요!<em>오늘도 화이팅! ✨</em></div>
+        <p class="al-sub2">오늘의 플랜이 기다리고 있어요. 같이 해봐요!</p>
+      </div>
+      <div class="al-feats">
+        <div class="al-feat"><div class="al-dot"></div><div class="al-ft">오늘 실행 기록이 기다려요</div></div>
+        <div class="al-feat"><div class="al-dot"></div><div class="al-ft">AI 인사이트 업데이트됐어요</div></div>
+        <div class="al-feat"><div class="al-dot"></div><div class="al-ft">연속 실행 streak 이어가봐요!</div></div>
+      </div>
+    </div>
+    <div class="auth-r">
+      <div class="ar-t">반가워요! 😊</div>
+      <div class="ar-s">로그인하고 오늘 목표 달성해봐요</div>
+      <div class="ar-err" id="le"></div>
+      <div class="fg"><label class="fl">이메일</label><input class="inp" id="lem" type="email" placeholder="email@example.com"></div>
+      <div class="fg"><label class="fl">비밀번호</label><input class="inp" id="lp" type="password" placeholder="비밀번호 입력"></div>
+      <button class="btn btn-main" style="width:100%;justify-content:center;padding:14px" onclick="doLogin()">로그인 →</button>
+      <div class="ar-sw">아직 계정이 없으신가요? <a onclick="G('signup')">무료로 시작하기</a></div>
+      <div style="text-align:center;margin-top:6px"><button class="btn btn-ghost" onclick="G('landing')">← 처음으로</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 온보딩 ══ -->
+<div id="onboarding" class="screen">
+  <div class="ob-layout">
+    <div class="ob-side">
+      <div class="obs-logo">🎯 Helpers <span>GoalFlow</span></div>
+      <div class="ob-steps">
+        <div class="si active" id="sb1"><div class="sn">1</div><div class="st">목표 정하기</div></div>
+        <div class="si" id="sb2"><div class="sn">2</div><div class="st">기간 & 시간</div></div>
+        <div class="si" id="sb3"><div class="sn">3</div><div class="st">현재 상황</div></div>
+        <div class="si" id="sb4"><div class="sn">4</div><div class="st">플랜 완성!</div></div>
+      </div>
+    </div>
+    <div class="ob-main">
+
+      <!-- Step 1 -->
+      <div class="os active" id="os1">
+        <div class="oe">Step 1 / 3</div>
+        <h2 class="ot">뭘 해내고 싶어요? 🤔</h2>
+        <p class="od">구체적으로 적을수록 더 딱 맞는 플랜이 나와요!<br>부담 없이 써봐요 😊</p>
+        <div class="fg"><label class="fl">어떤 분야예요?</label>
+          <div class="chips" id="gc">
+            <div class="chip" onclick="pick(this,'gc')">📚 공부/학습</div>
+            <div class="chip" onclick="pick(this,'gc')">💪 운동/헬스</div>
+            <div class="chip" onclick="pick(this,'gc')">💻 개발/코딩</div>
+            <div class="chip" onclick="pick(this,'gc')">🎨 창작/취미</div>
+            <div class="chip" onclick="pick(this,'gc')">💼 커리어</div>
+            <div class="chip" onclick="pick(this,'gc')">🌍 언어</div>
+            <div class="chip" onclick="pick(this,'gc')">🎯 기타</div>
+          </div>
+        </div>
+        <div class="fg"><label class="fl">구체적으로 어떤 목표예요?</label><input class="inp" id="og" placeholder="예: 토익 900점, 3kg 감량, React 프로젝트 완성..."></div>
+        <div class="fg"><label class="fl">이걸 이루면 어떻게 달라질 것 같아요?</label><textarea class="inp" id="ow" placeholder="솔직하게 써봐요. 이게 나중에 포기 안 하는 데 진짜 도움이 돼요 💪"></textarea></div>
+        <div class="ob-acts"><button class="btn btn-main" onclick="ob(2)">다음으로 →</button></div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="os" id="os2">
+        <div class="oe">Step 2 / 3</div>
+        <h2 class="ot">얼마나, 언제 할 수 있어요? ⏰</h2>
+        <p class="od">무리하지 않는 게 제일 중요해요!<br>현실적으로 가능한 시간만 적어줘요</p>
+        <div class="fg"><label class="fl">도전 기간</label>
+          <div class="chips" id="pd">
+            <div class="chip" onclick="pick(this,'pd')">1주</div>
+            <div class="chip" onclick="pick(this,'pd')">2주</div>
+            <div class="chip on" onclick="pick(this,'pd')">1개월</div>
+            <div class="chip" onclick="pick(this,'pd')">3개월</div>
+            <div class="chip" onclick="pick(this,'pd')">6개월</div>
+          </div>
+        </div>
+        <div class="fg"><label class="fl">요일별로 쓸 수 있는 시간 (분)</label>
+          <div class="sched">
+            <div class="dc"><div class="dn">월</div><input class="di" id="d0" type="number" value="60" min="0" max="720"><div class="du">분</div></div>
+            <div class="dc"><div class="dn">화</div><input class="di" id="d1" type="number" value="60" min="0" max="720"><div class="du">분</div></div>
+            <div class="dc"><div class="dn">수</div><input class="di" id="d2" type="number" value="60" min="0" max="720"><div class="du">분</div></div>
+            <div class="dc"><div class="dn">목</div><input class="di" id="d3" type="number" value="60" min="0" max="720"><div class="du">분</div></div>
+            <div class="dc"><div class="dn">금</div><input class="di" id="d4" type="number" value="60" min="0" max="720"><div class="du">분</div></div>
+            <div class="dc"><div class="dn">토</div><input class="di" id="d5" type="number" value="120" min="0" max="720"><div class="du">분</div></div>
+            <div class="dc"><div class="dn">일</div><input class="di" id="d6" type="number" value="120" min="0" max="720"><div class="du">분</div></div>
+          </div>
+        </div>
+        <div class="ob-acts">
+          <button class="btn btn-outline" onclick="ob(1)">← 이전</button>
+          <button class="btn btn-main" onclick="ob(3)">다음으로 →</button>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="os" id="os3">
+        <div class="oe">Step 3 / 3</div>
+        <h2 class="ot">지금 상태를 알려줘요 😅</h2>
+        <p class="od">솔직하게 적을수록 딱 맞는 플랜이 나와요.<br>판단 같은 거 없으니까 편하게 써요!</p>
+        <div class="fg"><label class="fl">지금 내 수준은?</label>
+          <div class="chips" id="lv">
+            <div class="chip on" onclick="pick(this,'lv')">완전 처음이에요</div>
+            <div class="chip" onclick="pick(this,'lv')">조금 알아요</div>
+            <div class="chip" onclick="pick(this,'lv')">중간 정도요</div>
+            <div class="chip" onclick="pick(this,'lv')">꽤 잘해요</div>
+          </div>
+        </div>
+        <div class="fg"><label class="fl">전에 비슷한 목표 세웠다가 실패한 적 있어요? 왜 그랬어요?</label><textarea class="inp" id="or2" placeholder="예: 처음엔 열심히 했는데 3일 만에 지쳐서... 시간이 없어서... 너무 어려워서..."></textarea></div>
+        <div class="ob-acts">
+          <button class="btn btn-outline" onclick="ob(2)">← 이전</button>
+          <button class="btn btn-main" onclick="startGen()">AI 플랜 만들어줘! ✨</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ 생성 중 ══ -->
+<div id="generating" class="screen">
+  <div class="gw">
+    <div class="g-anim"><div class="g-circle"></div><div class="g-ring"></div><div class="g-ring2"></div></div>
+    <div class="gt">플랜 만드는 중... 🤖</div>
+    <div class="gsub" id="gsub">입력하신 내용 분석하고 있어요!</div>
+    <ul class="gsteps">
+      <li class="gstep active" id="gs1"><div class="gdot"></div>목표랑 스케줄 파악 중</li>
+      <li class="gstep" id="gs2"><div class="gdot"></div>딱 맞는 강도 계산 중</li>
+      <li class="gstep" id="gs3"><div class="gdot"></div>하루 태스크 배치 중</li>
+      <li class="gstep" id="gs4"><div class="gdot"></div>무리 없는지 검토 중</li>
+      <li class="gstep" id="gs5"><div class="gdot"></div>플랜 완성!</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══ 대시보드 ══ -->
+<div id="dashboard" class="screen">
+  <nav class="dnav">
+    <div class="dnl-logo">🎯 Helpers <span>GoalFlow</span></div>
+    <div class="dnl">
+      <button class="dnlb active">홈</button>
+      <button class="dnlb">내 플랜</button>
+      <button class="dnlb">기록</button>
+      <button class="dnlb">분석</button>
+    </div>
+    <div class="dnu">
+      <div class="dnav2" id="nav-av">H</div>
+      <span class="dnn" id="nav-nm">사용자</span>
+      <button class="dnlo" onclick="doLogout()">로그아웃</button>
+    </div>
+  </nav>
+
+  <div class="dbody">
+
+    <!-- 알림 배너 (미실행 감지) -->
+    <div class="notif-bar" id="notif-bar" style="display:none">
+      <div class="notif-icon">🔔</div>
+      <div class="notif-text">
+        <strong>아직 오늘 실행을 안 했어요!</strong><br>
+        지금 딱 10분만 투자해봐요. 작은 시작이 큰 변화를 만들어요 💪
+      </div>
+      <button class="notif-btn" onclick="scrollToTasks()">지금 하러 가기</button>
+      <button class="notif-close" onclick="closeNotif()">✕</button>
+    </div>
+
+    <!-- 환영 배너 (플랜 없을 때) -->
+    <div class="wb" id="wb" style="display:none">
+      <div class="wb-t">
+        <h2>안녕하세요, <em id="wbn">친구</em>님! 👋</h2>
+        <p>아직 플랜이 없네요! 목표 입력하면 AI가 딱 맞는 플랜 바로 만들어드려요 🚀</p>
+      </div>
+      <button class="btn btn-main" onclick="G('onboarding')">첫 플랜 만들기! →</button>
+    </div>
+
+    <!-- 인사 (플랜 있을 때) -->
+    <div class="grt" id="grt" style="display:none">
+      <div class="grt-d" id="grtd">TODAY</div>
+      <div class="grt-t" id="grtt">안녕하세요, <em id="grtn">친구</em>님! 😊</div>
+    </div>
+
+    <!-- 목표 정보 -->
+    <div class="gic" id="gic" style="display:none">
+      <div class="gii" id="gii">🎯</div>
+      <div>
+        <div class="gin" id="gin">목표</div>
+        <div class="gim" id="gim">—</div>
+      </div>
+      <div style="margin-left:auto">
+        <span class="pbadge bm" id="plan-week-badge">1주차</span>
+      </div>
+    </div>
+
+    <!-- 통계 (플랜 있을 때) -->
+    <div class="sr" id="sr" style="display:none">
+      <div class="sc"><div class="scl">오늘 진행률</div><div class="scv g" id="sv1">0%</div><div class="scs" id="ss1">오늘 시작해봐요!</div></div>
+      <div class="sc"><div class="scl">연속 실행 🔥</div><div class="scv c" id="sv2">0일</div><div class="scs" id="ss2">오늘 첫 실행을 해봐요</div></div>
+      <div class="sc"><div class="scl">남은 기간</div><div class="scv" id="sv3">—</div><div class="scs" id="ss3">목표 향해 달려요!</div></div>
+      <div class="sc"><div class="scl">완료한 태스크</div><div class="scv" id="sv4">0</div><div class="scs" id="ss4">오늘 0개 남았어요</div></div>
+    </div>
+
+    <!-- 메인 그리드 (플랜 있을 때) -->
+    <div class="dg" id="dg" style="display:none">
+
+      <!-- 왼쪽: 오늘 플랜 -->
+      <div>
+        <div class="panel" id="today-panel">
+          <div class="ph">
+            <div class="pt">📋 오늘 할 것들</div>
+            <span class="pbadge bm" id="tbadge">날짜</span>
+          </div>
+          <div class="pbody">
+            <div class="prh">
+              <span class="prl" id="wklbl">1주차 진행 중</span>
+              <span class="prp" id="prpct">0 / 0 완료</span>
+            </div>
+            <div class="prbar"><div class="prfill" id="prfill" style="width:0%"></div></div>
+            <div class="tl" id="tlist"></div>
+            <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:10px;font-weight:600">이번 주 실행 현황</div>
+              <div class="wc" id="wchart"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI 채팅 플랜 수정 (유료) -->
+        <div style="margin-top:16px">
+          <div class="chat-panel" id="chat-panel">
+            <div class="chat-head">
+              <div class="pt">💬 AI랑 플랜 수정하기</div>
+              <span class="pbadge bp">PRO</span>
+            </div>
+            <!-- 잠금 오버레이 (무료 사용자) -->
+            <div id="chat-lock" style="position:relative">
+              <div class="chat-msgs" style="filter:blur(2px);pointer-events:none">
+                <div class="msg msg-ai">안녕하세요! 오늘 플랜 어떠세요? 너무 힘들거나 쉬우면 말해주세요 😊</div>
+                <div class="msg msg-user">오늘 공부 시간이 너무 많은 것 같아요</div>
+                <div class="msg msg-ai">그렇군요! <strong>60분 → 40분</strong>으로 줄이고 대신 집중도를 높여볼까요?</div>
+              </div>
+              <div style="position:absolute;inset:0;background:rgba(247,248,252,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-radius:0 0 var(--r) var(--r)">
+                <div style="font-size:28px">🔒</div>
+                <div style="font-size:14px;font-weight:700;color:var(--dark)">Pro 기능이에요</div>
+                <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.6;max-width:220px">AI랑 대화하면서 플랜을<br>내 상황에 맞게 수정할 수 있어요</div>
+                <button class="btn btn-main btn-sm" onclick="showUpgrade()">월 9,900원으로 시작하기 →</button>
+              </div>
+            </div>
+            <!-- 실제 채팅 (Pro 사용자) -->
+            <div id="chat-active" style="display:none">
+              <div class="chat-msgs" id="chat-msgs">
+                <div class="msg msg-ai">안녕하세요! 😊 오늘 플랜 어때요? 너무 힘들거나 쉬우면 말해주세요. 바로 조정해드릴게요!</div>
+              </div>
+              <div class="msg msg-typing" id="typing">
+                <span>AI가 답장 쓰는 중</span> <span style="animation:blink 1s infinite">...</span>
+              </div>
+              <div class="chat-input-row">
+                <input class="chat-inp" id="chat-input" placeholder="예: 오늘 너무 힘들어요, 시간을 줄여주세요..." onkeydown="if(event.key==='Enter')sendChat()">
+                <button class="chat-send" onclick="sendChat()">➤</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 오른쪽 사이드 -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+
+        <!-- AI 인사이트 + 실행 완료 -->
+        <div class="panel">
+          <div class="ph">
+            <div class="pt">🤖 AI 한마디</div>
+            <span class="pbadge bm"><div class="ail-dot" style="display:inline-block;margin-right:4px"></div>LIVE</span>
+          </div>
+          <div class="pbody">
+            <div class="aib" id="aitext">플랜이 시작됐어요! 오늘 첫 번째 태스크부터 시작해봐요. 작은 시작이 큰 변화를 만들어요 💪</div>
+            <button class="exb" id="exbtn" onclick="markAll()">오늘 다 했어요! ✓</button>
+          </div>
+        </div>
+
+        <!-- 연속 실행 -->
+        <div class="panel">
+          <div class="ph">
+            <div class="pt">🔥 연속 실행</div>
+            <span class="pbadge bgr" id="stbadge">아직 시작 전</span>
+          </div>
+          <div class="pbody">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:4px">
+              <div class="strk-num" id="stnum">0</div>
+              <div>
+                <div class="strk-lbl">일 연속! 🎉</div>
+                <div class="strk-sub" id="stsub">오늘 첫 실행을 시작해봐요!</div>
+              </div>
+            </div>
+            <div class="wdots" id="wdots"></div>
+          </div>
+        </div>
+
+        <!-- Pro 구독 -->
+        <div class="upg" id="upg-box">
+          <span class="upg-crown">👑</span>
+          <div class="upg-t">Pro로 업그레이드!</div>
+          <div class="upg-s">Helpers GoalFlow Pro</div>
+          <div class="upg-feat">
+            <div class="upg-fi">AI랑 대화로 플랜 수정</div>
+            <div class="upg-fi">1주일마다 자동 플랜 갱신</div>
+            <div class="upg-fi">실행 데이터 기반 맞춤 분석</div>
+            <div class="upg-fi">목표 여러 개 동시 관리</div>
+          </div>
+          <div class="upg-price">월 9,900원 <span>/ 언제든 해지 가능</span></div>
+          <button class="upg-b" onclick="showUpgrade()">지금 시작하기 →</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 빈 화면 (플랜 없을 때) -->
+    <div id="nopg" style="display:none">
+      <div class="sr" style="margin-bottom:18px">
+        <div class="sc"><div class="scl">오늘 진행률</div><div class="scv" style="color:var(--muted2)">—</div><div class="scs">플랜을 만들어봐요!</div></div>
+        <div class="sc"><div class="scl">연속 실행</div><div class="scv" style="color:var(--muted2)">—</div><div class="scs">플랜을 만들어봐요!</div></div>
+        <div class="sc"><div class="scl">남은 기간</div><div class="scv" style="color:var(--muted2)">—</div><div class="scs">플랜을 만들어봐요!</div></div>
+        <div class="sc"><div class="scl">완료 태스크</div><div class="scv" style="color:var(--muted2)">—</div><div class="scs">플랜을 만들어봐요!</div></div>
+      </div>
+      <div class="es">
+        <div class="es-icon">🎯</div>
+        <div class="es-t">아직 플랜이 없어요!</div>
+        <div class="es-d">목표랑 스케줄 입력하면<br>AI가 딱 맞는 플랜 바로 만들어드려요 🤖</div>
+        <button class="btn btn-main" onclick="G('onboarding')">플랜 만들러 가기! →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 업그레이드 모달 -->
+<div id="upg-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:var(--white);border-radius:var(--r);padding:32px;max-width:400px;width:90%;text-align:center;position:relative">
+    <button onclick="document.getElementById('upg-modal').style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>
+    <div style="font-size:36px;margin-bottom:12px">👑</div>
+    <div style="font-size:22px;font-weight:700;color:var(--dark);margin-bottom:6px">Helpers GoalFlow Pro</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">AI랑 대화하면서 플랜 수정하고<br>매주 자동으로 갱신되는 플랜을 받아봐요!</div>
+    <div style="background:var(--bg);border-radius:var(--r2);padding:16px;margin-bottom:20px;text-align:left">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-weight:600">Pro 기능</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--text2)">
+        <div>✅ AI랑 대화로 플랜 즉시 수정</div>
+        <div>✅ 1주일마다 실행률 기반 플랜 자동 갱신</div>
+        <div>✅ 심층 실행 분석 리포트</div>
+        <div>✅ 목표 여러 개 동시 관리</div>
+        <div>✅ 알림 커스터마이징</div>
+      </div>
+    </div>
+    <div style="font-size:28px;font-weight:700;color:var(--mint2);margin-bottom:6px">월 9,900원</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px">언제든 해지 가능 · 숨겨진 비용 없음</div>
+    <button class="btn btn-main" style="width:100%;justify-content:center;padding:14px;font-size:15px" onclick="activatePro()">지금 시작하기! 🚀</button>
+    <div style="font-size:11px;color:var(--muted2);margin-top:10px">* 데모용: 클릭하면 Pro 기능이 활성화돼요</div>
+  </div>
+</div>
+
+<script>
+const KEY='hgf3';
+let CU=null;
+function ldb(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch{return{}}}
+function sdb(d){localStorage.setItem(KEY,JSON.stringify(d))}
+
+function G(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function err(el,msg){el.textContent=msg;el.style.display='block'}
+
+// ── 인증 ──
+function doSignup(){
+  const n=document.getElementById('sn').value.trim();
+  const em=document.getElementById('sem').value.trim().toLowerCase();
+  const p=document.getElementById('sp').value;
+  const p2=document.getElementById('sp2').value;
+  const e=document.getElementById('se');
+  e.style.display='none';
+  if(!n) return err(e,'이름을 입력해주세요 😊');
+  if(!em.includes('@')) return err(e,'이메일 주소를 다시 확인해봐요!');
+  if(p.length<8) return err(e,'비밀번호는 8자 이상이어야 해요!');
+  if(p!==p2) return err(e,'비밀번호가 서로 달라요!');
+  let db=ldb();
+  if(!db.users) db.users={};
+  if(db.users[em]) return err(e,'이미 가입된 이메일이에요. 로그인해봐요!');
+  db.users[em]={name:n,pw:p,plan:null,history:{},isPro:false};
+  sdb(db);
+  CU={email:em,name:n};
+  sessionStorage.setItem('hgfs',JSON.stringify(CU));
+  enterDash();
+}
+
+function doLogin(){
+  const em=document.getElementById('lem').value.trim().toLowerCase();
+  const p=document.getElementById('lp').value;
+  const e=document.getElementById('le');
+  e.style.display='none';
+  const db=ldb();
+  const u=db.users&&db.users[em];
+  if(!u) return err(e,'등록된 이메일이 없어요. 회원가입 먼저 해봐요!');
+  if(u.pw!==p) return err(e,'비밀번호가 틀렸어요. 다시 확인해봐요!');
+  CU={email:em,name:u.name};
+  sessionStorage.setItem('hgfs',JSON.stringify(CU));
+  enterDash();
+}
+
+function doLogout(){
+  CU=null;
+  sessionStorage.removeItem('hgfs');
+  G('landing');
+}
+
+// ── 온보딩 ──
+function pick(el,gid){
+  document.querySelectorAll('#'+gid+' .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function ob(step){
+  document.querySelectorAll('.os').forEach(s=>s.classList.remove('active'));
+  document.getElementById('os'+step).classList.add('active');
+  for(let i=1;i<=4;i++){
+    const s=document.getElementById('sb'+i);
+    s.classList.remove('active','done');
+    if(i<step) s.classList.add('done');
+    if(i===step) s.classList.add('active');
+  }
+}
+
+function startGen(){
+  if(!CU){G('signup');return}
+  const goal=document.getElementById('og').value.trim()||'나의 목표';
+  const cat=document.querySelector('#gc .chip.on')?.textContent||'🎯 기타';
+  const period=document.querySelector('#pd .chip.on')?.textContent||'1개월';
+  const level=document.querySelector('#lv .chip.on')?.textContent||'완전 처음이에요';
+  const reason=document.getElementById('or2').value.trim();
+  const sched=[0,1,2,3,4,5,6].map(i=>parseInt(document.getElementById('d'+i)?.value||60));
+  const startDate=todayStr();
+  const days=p2d(period);
+  const endDate=addD(startDate,days-1);
+  const plan={goal,cat,period,level,reason,sched,startDate,endDate,totalDays:days};
+  let db=ldb();
+  db.users[CU.email].plan=plan;
+  db.users[CU.email].history={};
+  sdb(db);
+  G('generating');
+  const ss=['gs1','gs2','gs3','gs4','gs5'];
+  const subs=['목표랑 스케줄 파악하는 중!','딱 맞는 강도 계산하는 중!','하루 태스크 배치하는 중!','무리 없는지 검토하는 중!','거의 다 됐어요! 🎉'];
+  let cur=0;
+  function tick(){
+    if(cur>0){
+      document.getElementById(ss[cur-1]).classList.remove('active');
+      document.getElementById(ss[cur-1]).classList.add('done');
+    }
+    if(cur<ss.length){
+      document.getElementById(ss[cur]).classList.add('active');
+      document.getElementById('gsub').textContent=subs[cur];
+      cur++;
+      setTimeout(tick,850);
+    } else {
+      setTimeout(()=>enterDash(),600);
+    }
+  }
+  setTimeout(tick,400);
+}
+
+// ── 대시보드 ──
+function enterDash(){
+  const db=ldb();
+  const u=db.users&&db.users[CU?.email];
+  if(!u){G('login');return}
+  sessionStorage.setItem('hgfs',JSON.stringify(CU));
+  document.getElementById('nav-av').textContent=CU.name.charAt(0).toUpperCase();
+  document.getElementById('nav-nm').textContent=CU.name+'님';
+  const now=new Date();
+  const h=now.getHours();
+  const greeting = h<12?'좋은 아침이에요':h<18?'안녕하세요':'좋은 저녁이에요';
+  const DNS=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const ms=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('grtd').textContent=ms[now.getMonth()]+' '+now.getDate()+'일 '+DNS[now.getDay()];
+  document.getElementById('grtt').innerHTML=greeting+', <em id="grtn">'+CU.name+'</em>님! 😊';
+  if(u.plan) showWithPlan(u);
+  else showNoPlan();
+  // Pro 상태 체크
+  if(u.isPro) activateProUI();
+  G('dashboard');
+}
+
+function showNoPlan(){
+  document.getElementById('wb').style.display='flex';
+  document.getElementById('wbn').textContent=CU.name;
+  document.getElementById('grt').style.display='none';
+  document.getElementById('gic').style.display='none';
+  document.getElementById('sr').style.display='none';
+  document.getElementById('dg').style.display='none';
+  document.getElementById('nopg').style.display='block';
+  document.getElementById('notif-bar').style.display='none';
+}
+
+function showWithPlan(u){
+  document.getElementById('wb').style.display='none';
+  document.getElementById('grt').style.display='block';
+  document.getElementById('gic').style.display='flex';
+  document.getElementById('sr').style.display='grid';
+  document.getElementById('dg').style.display='grid';
+  document.getElementById('nopg').style.display='none';
+  const plan=u.plan,hist=u.history||{},today=todayStr();
+  // 목표 정보
+  const emap={'공부':'📚','운동':'💪','개발':'💻','창작':'🎨','커리어':'💼','언어':'🌍','기타':'🎯'};
+  const ekey=Object.keys(emap).find(k=>plan.cat&&plan.cat.includes(k))||'기타';
+  document.getElementById('gii').textContent=emap[ekey];
+  document.getElementById('gin').textContent=plan.goal;
+  const end=new Date(plan.endDate),dl=Math.max(0,Math.ceil((end-new Date())/86400000));
+  document.getElementById('gim').textContent=fd(plan.startDate)+' ~ '+fd(plan.endDate)+' · D-'+dl;
+  document.getElementById('tbadge').textContent=fdko(today);
+  const wk=wkNum(plan.startDate,today);
+  document.getElementById('wklbl').textContent=wk+'주차 진행 중';
+  document.getElementById('plan-week-badge').textContent=wk+'주차';
+  // 오늘 태스크
+  const dow=new Date().getDay(),di=dow===0?6:dow-1;
+  const tasks=buildTasks(plan,di);
+  const th=hist[today]||{};
+  renderTasks(tasks,th,today,plan);
+  updProg(tasks,th);
+  document.getElementById('sv3').textContent=dl+'일';
+  document.getElementById('ss3').textContent=plan.goal;
+  // 스트릭
+  const strk=calcStreak(hist,today);
+  updStreakUI(strk);
+  renderWdots(hist,today);
+  renderWchart(hist,today);
+  updInsight(strk,tasks,th);
+  // 알림 (오늘 아직 안 했으면)
+  const todayDone=tasks.some(t=>!!th['t'+t.id]);
+  if(!todayDone && tasks.length>0){
+    document.getElementById('notif-bar').style.display='flex';
+  }
+}
+
+function updStreakUI(strk){
+  document.getElementById('stnum').textContent=strk;
+  document.getElementById('sv2').textContent=strk+'일';
+  if(strk>=1){
+    document.getElementById('stbadge').className='pbadge bc';
+    document.getElementById('stbadge').textContent='🔥 '+strk+'일째!';
+    document.getElementById('stsub').textContent=strk>=7?'일주일 연속! 진짜 대단해요!':strk>=3?'이 페이스 계속 이어봐요!':'시작이 반이에요!';
+    document.getElementById('ss2').textContent='최고 기록 갱신 중!';
+  } else {
+    document.getElementById('stbadge').className='pbadge bgr';
+    document.getElementById('stbadge').textContent='아직 시작 전';
+    document.getElementById('stsub').textContent='오늘 첫 실행을 해봐요!';
+  }
+}
+
+// ── 태스크 ──
+function buildTasks(plan,di){
+  const mins=Math.max(plan.sched[di]||0,30);
+  const tpls=getTpls(plan.cat,plan.level);
+  const tasks=[];let used=0;
+  for(let i=0;i<tpls.length&&used<mins;i++){
+    const t=tpls[i],dur=Math.min(t.dur,mins-used);
+    if(dur>=10){tasks.push({id:i+1,name:t.name,dur,time:m2t(used)});used+=dur;}
+  }
+  return tasks;
+}
+
+function getTpls(cat,level){
+  const base={
+    '공부':[{name:'오늘 학습 목표 정하기',dur:5},{name:'핵심 강의·자료 학습',dur:60},{name:'노트 정리',dur:25},{name:'연습 문제 풀기',dur:35},{name:'오늘 내용 복습',dur:20}],
+    '운동':[{name:'준비 운동 & 스트레칭',dur:10},{name:'메인 운동',dur:50},{name:'쿨다운',dur:10},{name:'운동 기록 남기기',dur:5}],
+    '개발':[{name:'오늘 할 것 정리',dur:10},{name:'코딩 & 구현',dur:80},{name:'디버깅 & 정리',dur:20},{name:'커밋 & 기록',dur:10}],
+    '언어':[{name:'어제 단어 복습',dur:15},{name:'새 단어 & 표현 학습',dur:30},{name:'듣기 or 말하기 연습',dur:25},{name:'오늘 학습 정리',dur:10}],
+    '창작':[{name:'오늘 목표 정하기',dur:10},{name:'본 작업',dur:70},{name:'피드백 & 정리',dur:20}],
+    '커리어':[{name:'오늘 목표 확인',dur:10},{name:'핵심 작업',dur:60},{name:'진행 상황 기록',dur:15}],
+  };
+  const k=Object.keys(base).find(k=>cat&&cat.includes(k))||'공부';
+  return base[k];
+}
+
+function m2t(mins){
+  const b=9*60+mins,h=Math.floor(b/60)%24,m=b%60;
+  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+}
+
+function renderTasks(tasks,hist,today,plan){
+  const list=document.getElementById('tlist');
+  list.innerHTML='';
+  if(!tasks.length){
+    list.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">오늘은 쉬는 날이에요! 푹 쉬세요 😊</div>';
+    return;
+  }
+  tasks.forEach(t=>{
+    const done=!!hist['t'+t.id];
+    const div=document.createElement('div');
+    div.className='ti'+(done?' done':'');
+    div.onclick=()=>toggleT(t.id,tasks,today,plan);
+    div.innerHTML='<div class="tck">'+(done?'✓':'')+'</div><div class="tmeta"><div class="tname">'+t.name+'</div><div class="ttime">'+t.time+' ~</div></div><div class="tdur">'+t.dur+'분</div>';
+    list.appendChild(div);
+  });
+}
+
+function toggleT(id,tasks,today,plan){
+  const db=ldb();
+  const hist=db.users[CU.email].history;
+  if(!hist[today]) hist[today]={};
+  hist[today]['t'+id]=!hist[today]['t'+id];
+  sdb(db);
+  const th=hist[today];
+  renderTasks(tasks,th,today,plan);
+  updProg(tasks,th);
+  const strk=calcStreak(hist,today);
+  updStreakUI(strk);
+  renderWdots(hist,today);
+  renderWchart(hist,today);
+  updInsight(strk,tasks,th);
+  // 하나라도 했으면 알림 숨기기
+  if(Object.values(th).some(v=>v)) document.getElementById('notif-bar').style.display='none';
+}
+
+function updProg(tasks,hist){
+  if(!tasks.length) return;
+  const done=tasks.filter(t=>!!hist['t'+t.id]).length;
+  const pct=Math.round(done/tasks.length*100);
+  document.getElementById('prpct').textContent=done+' / '+tasks.length+' 완료';
+  document.getElementById('prfill').style.width=pct+'%';
+  document.getElementById('sv1').textContent=pct+'%';
+  document.getElementById('sv4').textContent=done;
+  document.getElementById('ss1').textContent=done===tasks.length?'🎉 오늘 완전 완료!':'아직 '+(tasks.length-done)+'개 남았어요';
+  document.getElementById('ss4').textContent='오늘 총 '+tasks.length+'개';
+}
+
+function markAll(){
+  const db=ldb();
+  const plan=db.users[CU.email].plan;
+  const hist=db.users[CU.email].history;
+  const today=todayStr();
+  const dow=new Date().getDay(),di=dow===0?6:dow-1;
+  const tasks=buildTasks(plan,di);
+  if(!hist[today]) hist[today]={};
+  tasks.forEach(t=>hist[today]['t'+t.id]=true);
+  sdb(db);
+  renderTasks(tasks,hist[today],today,plan);
+  updProg(tasks,hist[today]);
+  const strk=calcStreak(hist,today);
+  updStreakUI(strk);
+  renderWdots(hist,today);
+  renderWchart(hist,today);
+  updInsight(strk,tasks,hist[today]);
+  document.getElementById('notif-bar').style.display='none';
+  const btn=document.getElementById('exbtn');
+  btn.textContent='오늘도 해냈어요! 🎉';
+  btn.disabled=true;
+}
+
+function scrollToTasks(){
+  document.getElementById('today-panel')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function closeNotif(){
+  document.getElementById('notif-bar').style.display='none';
+}
+
+// ── 스트릭 & 차트 ──
+function calcStreak(hist,today){
+  let s=0,d=new Date(today);
+  while(true){
+    const ds=d.toISOString().slice(0,10),h=hist[ds],ok=h&&Object.values(h).some(v=>v);
+    if(!ok) break;
+    s++;d.setDate(d.getDate()-1);
+  }
+  return s;
+}
+
+function renderWdots(hist,today){
+  const w=document.getElementById('wdots');w.innerHTML='';
+  const mon=getMonday(today);
+  for(let i=0;i<7;i++){
+    const d=addD(mon,i),h=hist[d],ok=h&&Object.values(h).some(v=>v),it=d===today;
+    const el=document.createElement('div');
+    el.className='wd'+(it?' tod':ok?' done':'');
+    w.appendChild(el);
+  }
+}
+
+function renderWchart(hist,today){
+  const c=document.getElementById('wchart');c.innerHTML='';
+  const mon=getMonday(today),labs=['월','화','수','목','금','토','일'];
+  for(let i=0;i<7;i++){
+    const d=addD(mon,i),h=hist[d]||{};
+    const tot=Object.keys(h).length,dn=Object.values(h).filter(v=>v).length;
+    const pct=tot?dn/tot:0,it=d===today;
+    const bw=document.createElement('div');bw.className='bw';
+    const bar=document.createElement('div');bar.className='bar';
+    bar.style.height=Math.max(3,pct*44)+'px';
+    if(it) bar.classList.add('tod');
+    else if(pct>0) bar.classList.add('done');
+    const lbl=document.createElement('div');lbl.className='bl';lbl.textContent=labs[i];
+    bw.appendChild(bar);bw.appendChild(lbl);c.appendChild(bw);
+  }
+}
+
+// ── AI 인사이트 ──
+function updInsight(strk,tasks,hist){
+  const done=tasks.filter(t=>!!hist['t'+t.id]).length,tot=tasks.length;
+  const pct=tot?Math.round(done/tot*100):0;
+  let msg='';
+  if(pct===100) msg='오늘 모든 태스크 완료! <strong>진짜 대단해요 🎉</strong> 이 페이스면 목표 달성 확실해요!';
+  else if(pct>=60) msg='오늘 <strong>'+pct+'% 완료</strong>했어요! 거의 다 왔어요. 마지막 '+(tot-done)+'개만 더 해봐요 💪';
+  else if(strk>=3) msg='<strong>'+strk+'일 연속 실행 중!</strong> 습관이 만들어지고 있어요. 오늘 첫 번째 태스크부터 시작해봐요!';
+  else msg='오늘 플랜이 기다리고 있어요! 첫 번째 태스크부터 시작해봐요. 시작이 제일 어렵고, 그 다음은 쭉 가요 😊';
+  document.getElementById('aitext').innerHTML=msg;
+}
+
+// ── AI 채팅 ──
+const chatResponses=[
+  ['힘들','너무 무리하면 안 되죠! 오늘 시간을 <strong>20분 줄여드릴게요</strong>. 꾸준히 하는 게 제일 중요해요 😊'],
+  ['쉬워','실력이 늘고 있는 거예요! 내일부터 <strong>15분 더 추가</strong>해볼까요?'],
+  ['시간','오늘 특별히 바쁘군요. <strong>핵심 태스크 1개</strong>만 해도 충분해요!'],
+  ['모르','어떤 부분이 헷갈려요? 좀 더 쉬운 내용부터 시작하도록 <strong>플랜 조정</strong>해드릴게요 🙌'],
+  ['','AI가 확인했어요! 내일 플랜에 반영할게요. 오늘도 수고했어요 💪'],
+];
+
+function sendChat(){
+  const inp=document.getElementById('chat-input');
+  const msg=inp.value.trim();
+  if(!msg) return;
+  addMsg(msg,'user');
+  inp.value='';
+  const typing=document.getElementById('typing');
+  typing.style.display='flex';
+  setTimeout(()=>{
+    typing.style.display='none';
+    const found=chatResponses.find(r=>r[0]&&msg.includes(r[0]))||chatResponses[chatResponses.length-1];
+    addMsg(found[1],'ai');
+  },1200);
+}
+
+function addMsg(text,type){
+  const msgs=document.getElementById('chat-msgs');
+  const div=document.createElement('div');
+  div.className='msg msg-'+(type==='ai'?'ai':'user');
+  div.innerHTML=text;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+// ── Pro ──
+function showUpgrade(){
+  document.getElementById('upg-modal').style.display='flex';
+}
+
+function activatePro(){
+  const db=ldb();
+  if(CU&&db.users[CU.email]) db.users[CU.email].isPro=true;
+  sdb(db);
+  document.getElementById('upg-modal').style.display='none';
+  activateProUI();
+}
+
+function activateProUI(){
+  document.getElementById('chat-lock').style.display='none';
+  document.getElementById('chat-active').style.display='block';
+  const upgBox=document.getElementById('upg-box');
+  if(upgBox) upgBox.innerHTML='<div style="text-align:center;padding:16px"><div style="font-size:24px;margin-bottom:8px">👑</div><div style="font-size:14px;font-weight:700;color:#fff">Pro 이용 중</div><div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:4px">월 9,900원 정기결제</div></div>';
+  upgBox.style.background='linear-gradient(135deg,#1e2030,#2a3050)';
+}
+
+// ── 날짜 유틸 ──
+function todayStr(){return new Date().toISOString().slice(0,10)}
+function addD(ds,n){const d=new Date(ds);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+function p2d(p){return{'1주':7,'2주':14,'1개월':30,'3개월':90,'6개월':180}[p]||30}
+function wkNum(start,today){return Math.floor((new Date(today)-new Date(start))/86400000/7)+1}
+function getMonday(ds){const d=new Date(ds),day=d.getDay(),diff=day===0?-6:1-day;d.setDate(d.getDate()+diff);return d.toISOString().slice(0,10)}
+function fd(ds){const d=new Date(ds);return(d.getMonth()+1)+'/'+d.getDate()}
+function fdko(ds){const d=new Date(ds),days=['일','월','화','수','목','금','토'],ms=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];return ms[d.getMonth()]+' '+d.getDate()+'일 '+days[d.getDay()]+'요일'}
+
+// ── 자동 로그인 ──
+document.addEventListener('DOMContentLoaded',()=>{
+  const s=sessionStorage.getItem('hgfs');
+  if(s){
+    try{
+      CU=JSON.parse(s);
+      const db=ldb();
+      if(db.users&&db.users[CU.email]){enterDash();return}
+    }catch{}
+  }
+});
+</script>
+</body>
+</html>
